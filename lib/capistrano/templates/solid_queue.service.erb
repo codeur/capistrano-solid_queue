@@ -1,0 +1,27 @@
+[Unit]
+Description=SolidQueue background job
+After=syslog.target network.target
+
+[Service]
+Type=simple
+Environment='RAILS_ENV=<%= fetch(:stage) %>'
+<% fetch(:default_env).reject{ |k, _| k.to_s == 'path' }.each do |variable, value| -%>
+Environment='<%= variable.to_s.upcase %>=<%= value.to_s %>'
+<% end -%>
+WorkingDirectory=<%= current_path %>
+ExecStart=<%= capture(:echo, SSHKit.config.command_map[:bundle]).strip %> exec rake solid_queue:start
+ExecReload=/bin/kill -TSTP $MAINPID
+ExecStop=/bin/kill -TERM $MAINPID
+Environment=MALLOC_ARENA_MAX=2
+
+# if we crash, restart
+RestartSec=1
+Restart=on-failure
+
+<%= "StandardOutput=append:#{fetch(:solid_queue_access_log)}" if fetch(:solid_queue_access_log) %>
+<%= "StandardError=append:#{fetch(:solid_queue_error_log)}" if fetch(:solid_queue_error_log) %>
+
+SyslogIdentifier=<%= fetch(:solid_queue_service_unit_name) %>
+
+[Install]
+WantedBy=default.target
