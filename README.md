@@ -91,4 +91,4 @@ Everyone interacting in the Capistrano::SolidQueue project's codebases, issue tr
 ## Credits
 
 The structure and code of the gem are heavily inspired by [`capistrano-good_job`](https://github.com/mtomov/capistrano-good-job)'s [`systemd` tasks](https://github.com/seuros/capistrano-puma/blob/master/lib/capistrano/tasks/systemd.rake)
-and [(How I) Deploy Solid Queue with Capistrano](https://world.hey.com/robzolkos/how-i-deploy-solid-queue-with-capistrano-487b4a31) article.
+and [(How I) Deploy Solid Queue with Capistrano](https://world.hey.com/robzolkos/how-i-deploy-solid-queue-with-capistrano-487b4a31) article from [Rob Zolkos](https://world.hey.com/robzolkos).
