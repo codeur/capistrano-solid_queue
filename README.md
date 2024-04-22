@@ -8,6 +8,7 @@ solid_queue:disable                    # Disable solid_queue systemd service
 solid_queue:enable                     # Enable solid_queue systemd service
 solid_queue:install                    # Install solid_queue systemd service
 solid_queue:reload                     # Reload solid_queue service via systemd
+solid_queue:quiet                      # Quiet solid_queue service via systemd
 solid_queue:restart                    # Restart solid_queue service via systemd
 solid_queue:start                      # Start solid_queue service via systemd
 solid_queue:status                     # Get solid_queue service status via systemd
