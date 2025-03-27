@@ -25,8 +25,25 @@ module Capistrano
       end
 
       def execute_systemd(*args, raise_on_non_zero_exit: true)
-        command = ["/bin/systemctl", "--user"] + args
-        backend.execute(*command, raise_on_non_zero_exit: raise_on_non_zero_exit)
+        sudo_if_needed(*systemd_command(*args), raise_on_non_zero_exit: true)
+      end
+
+      def sudo_if_needed(*command, raise_on_non_zero_exit: true)
+        if fetch(:solid_queue_systemctl_user) == :system
+          backend.sudo command.map(&:to_s).join(" ")
+        else
+          backend.execute(*command, raise_on_non_zero_exit: raise_on_non_zero_exit)
+        end
+      end
+
+      def systemd_command(*args)
+        command = ['/bin/systemctl']
+
+        unless fetch(:solid_queue_systemctl_user) == :system
+          command << "--user"
+        end
+
+        command + args
       end
 
       def fetch_systemd_unit_path
