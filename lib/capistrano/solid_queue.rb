@@ -37,7 +37,7 @@ module Capistrano
       end
 
       def systemd_command(*args)
-        command = ['/bin/systemctl']
+        command = ["/bin/systemctl"]
 
         unless fetch(:solid_queue_systemctl_user) == :system
           command << "--user"
