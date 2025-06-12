@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [0.1.2] - 2025-06-12
+
+- Quiet task only runs on :solid_queue_role [#3](https://github.com/codeur/capistrano-solid_queue/pull/5) by [@bashcoder](https://github.com/bashcoder)
+
 ## [0.1.1] - 2025-03-27
 
 - Fix system user [#2](https://github.com/codeur/capistrano-solid_queue/pull/2) by [@lubosch](https://github.com/lubosch)
