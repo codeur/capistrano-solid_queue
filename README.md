@@ -70,6 +70,56 @@ through their Capistrano counterparts, ex: `bundle exec cap solid_queue:restart`
 The plugin has registered a Capistrano `hook` to run `bundle exec cap solid_queue:restart` after deploy.
 See [`#register_hooks`](lib/capistrano/solid_queue.rb)
 
+## Configuration
+
+The following variables can be set in your `deploy.rb` or stage files:
+
+```ruby
+set :solid_queue_role, :db # default
+set :solid_queue_access_log, -> { File.join(shared_path, "log", "solid_queue.log") }
+set :solid_queue_error_log,  -> { File.join(shared_path, "log", "solid_queue.log") }
+set :solid_queue_service_unit_name, -> { "#{fetch(:application)}_solid_queue_#{fetch(:stage)}" }
+set :solid_queue_systemctl_user, :user # or :system
+
+# What runs after `bundle exec` — override for SolidQueue >= 0.4:
+set :solid_queue_command, "bin/jobs"
+
+# Unix user for the service when running in :system mode
+# (defaults to :run_as, then to Capistrano's :user)
+set :solid_queue_user, "deploy"
+```
+
+### Environment variables
+
+Two variables let you inject arbitrary environment into the generated systemd unit
+(inspired by [`capistrano-sidekiq`](https://github.com/seuros/capistrano-sidekiq)):
+
+```ruby
+# Referenced via `EnvironmentFile=` — one line per file
+set :solid_queue_service_unit_env_files, %w[
+  /etc/environment
+  /home/deploy/apps/my_app/shared/.env
+]
+
+# Rendered as `Environment="KEY=VALUE"` — one line per entry
+set :solid_queue_service_unit_env_vars, [
+  "RAILS_LOG_TO_STDOUT=1",
+  "DB_POOL=10",
+  "SOLID_QUEUE_IN_PUMA=false"
+]
+```
+
+If your project already sets `:service_unit_env_files` / `:service_unit_env_vars`
+(shared with other systemd-based capistrano plugins), they are picked up as
+the default — you only need to override when SolidQueue should see a different
+set of variables.
+
+Only `RAILS_ENV=<stage>` is set implicitly (it is derived directly from the
+Capistrano stage). Capistrano's `default_env` is **not** rendered into the unit
+file — pass anything else you need (including tuning knobs like
+`MALLOC_ARENA_MAX`) via `:solid_queue_service_unit_env_vars` or
+`:solid_queue_service_unit_env_files`.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.

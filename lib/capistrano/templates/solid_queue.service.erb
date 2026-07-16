@@ -1,18 +1,21 @@
 [Unit]
-Description=SolidQueue background job
+Description=SolidQueue background job for <%= "#{fetch(:application)} (#{fetch(:stage)})" %>
 After=syslog.target network.target
 
 [Service]
 Type=simple
-Environment='RAILS_ENV=<%= fetch(:stage) %>'
-<% fetch(:default_env).reject{ |k, _| k.to_s == 'path' }.each do |variable, value| -%>
-Environment='<%= variable.to_s.upcase %>=<%= value.to_s %>'
+<%= "User=#{fetch(:solid_queue_user)}" if fetch(:solid_queue_systemctl_user) == :system %>
+Environment=RAILS_ENV=<%= fetch(:stage) %>
+<% Array(fetch(:solid_queue_service_unit_env_files)).each do |file| -%>
+EnvironmentFile=<%= file %>
+<% end -%>
+<% Array(fetch(:solid_queue_service_unit_env_vars)).each do |environment_variable| -%>
+Environment="<%= environment_variable %>"
 <% end -%>
 WorkingDirectory=<%= current_path %>
-ExecStart=<%= capture(:echo, SSHKit.config.command_map[:bundle]).strip %> exec rake solid_queue:start
+ExecStart=<%= capture(:echo, SSHKit.config.command_map[:bundle]).strip %> exec <%= fetch(:solid_queue_command) %>
 ExecReload=/bin/kill -TSTP $MAINPID
 ExecStop=/bin/kill -TERM $MAINPID
-Environment=MALLOC_ARENA_MAX=2
 
 # if we crash, restart
 RestartSec=1
@@ -24,4 +27,4 @@ Restart=on-failure
 SyslogIdentifier=<%= fetch(:solid_queue_service_unit_name) %>
 
 [Install]
-WantedBy=default.target
+WantedBy=<%= fetch(:solid_queue_systemctl_user) == :system ? "multi-user.target" : "default.target" %>

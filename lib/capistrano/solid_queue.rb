@@ -10,7 +10,21 @@ module Capistrano
         set_if_empty :solid_queue_access_log, -> { File.join(shared_path, "log", "solid_queue.log") }
         set_if_empty :solid_queue_error_log, -> { File.join(shared_path, "log", "solid_queue.log") }
         set_if_empty :solid_queue_service_unit_name, -> { "#{fetch(:application)}_solid_queue_#{fetch(:stage)}" }
+        set_if_empty :solid_queue_systemctl_user, :user
         set_if_empty :solid_queue_systemd_conf_dir, -> { fetch_systemd_unit_path }
+
+        # Command executed by the systemd unit (concatenated after `bundle exec`).
+        # Override with e.g. "bin/jobs" for SolidQueue >= 0.4 setups.
+        set_if_empty :solid_queue_command, "rake solid_queue:start"
+
+        # Unix user the service runs as when using `:system` mode. Falls back to
+        # `:run_as` (shared with other systemd capistrano plugins) and finally
+        # the SSH `:user` capistrano connects with.
+        set_if_empty :solid_queue_user, -> { fetch(:run_as, fetch(:user)) }
+
+        # SolidQueue could have a stripped down or more complex version of the environment variables
+        set_if_empty :solid_queue_service_unit_env_files, -> { fetch(:service_unit_env_files, []) }
+        set_if_empty :solid_queue_service_unit_env_vars, -> { fetch(:service_unit_env_vars, []) }
       end
 
       def define_tasks
