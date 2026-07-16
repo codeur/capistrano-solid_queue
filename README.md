@@ -75,7 +75,7 @@ See [`#register_hooks`](lib/capistrano/solid_queue.rb)
 The following variables can be set in your `deploy.rb` or stage files:
 
 ```ruby
-set :solid_queue_role, :app
+set :solid_queue_role, :db # default
 set :solid_queue_access_log, -> { File.join(shared_path, "log", "solid_queue.log") }
 set :solid_queue_error_log,  -> { File.join(shared_path, "log", "solid_queue.log") }
 set :solid_queue_service_unit_name, -> { "#{fetch(:application)}_solid_queue_#{fetch(:stage)}" }
@@ -91,7 +91,7 @@ set :solid_queue_user, "deploy"
 
 ### Environment variables
 
-Two hooks let you inject arbitrary environment into the generated systemd unit
+Two variables let you inject arbitrary environment into the generated systemd unit
 (inspired by [`capistrano-sidekiq`](https://github.com/seuros/capistrano-sidekiq)):
 
 ```ruby

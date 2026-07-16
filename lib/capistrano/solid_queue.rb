@@ -10,6 +10,7 @@ module Capistrano
         set_if_empty :solid_queue_access_log, -> { File.join(shared_path, "log", "solid_queue.log") }
         set_if_empty :solid_queue_error_log, -> { File.join(shared_path, "log", "solid_queue.log") }
         set_if_empty :solid_queue_service_unit_name, -> { "#{fetch(:application)}_solid_queue_#{fetch(:stage)}" }
+        set_if_empty :solid_queue_systemctl_user, :user
         set_if_empty :solid_queue_systemd_conf_dir, -> { fetch_systemd_unit_path }
 
         # Command executed by the systemd unit (concatenated after `bundle exec`).
