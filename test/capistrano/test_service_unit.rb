@@ -20,6 +20,10 @@ class Capistrano::TestServiceUnit < Minitest::Test
     refute_match(/^User=/, generate_unit)
   end
 
+  def test_service_starts_solid_queue_with_bin_jobs
+    assert_match(/^ExecStart=\S+.* exec bin\/jobs$/, generate_unit)
+  end
+
   def test_service_has_no_reload_command
     refute_includes generate_unit, "ExecReload"
   end

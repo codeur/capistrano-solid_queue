@@ -18,10 +18,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Deploys no longer run `solid_queue:quiet` after `deploy:starting`. Solid Queue has no quiet mode: the `SIGTERM` it sends starts a shutdown, so jobs stopped for the whole deploy. The service is now stopped after `deploy:updated` and started after `deploy:published` ([#15](https://github.com/codeur/capistrano-solid_queue/pull/15)).
 - Ruby 3.1 or later is required ([#15](https://github.com/codeur/capistrano-solid_queue/pull/15)).
 - Capistrano 3.5 or later is required: `Capistrano::Plugin` doesn't exist before ([#15](https://github.com/codeur/capistrano-solid_queue/pull/15)).
+- The service starts Solid Queue with `bin/jobs`, as Solid Queue documents, instead of `rake solid_queue:start`. The application needs `bin/jobs`: Rails 8 applications have it, and `bin/rails solid_queue:install` creates it. Run `cap <stage> solid_queue:install` again to update an installed service ([#16](https://github.com/codeur/capistrano-solid_queue/pull/16)).
 
 ### Removed
 
 - `solid_queue:reload` and the `ExecReload=` line of the service: the `SIGTSTP` it sent didn't reload Solid Queue ([#15](https://github.com/codeur/capistrano-solid_queue/pull/15)).
+- `solid_queue:quiet`: Solid Queue has no quiet mode, the `SIGTERM` it sent started a shutdown. `solid_queue:stop` stops Solid Queue gracefully ([#16](https://github.com/codeur/capistrano-solid_queue/pull/16)).
 
 ### Fixed
 
@@ -30,6 +32,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `solid_queue:uninstall` removes only the unit of the service, not every file whose name starts with it ([#15](https://github.com/codeur/capistrano-solid_queue/pull/15)).
 - `solid_queue:status` shows the status of a stopped service instead of failing ([#15](https://github.com/codeur/capistrano-solid_queue/pull/15)).
 - The README lists the hooks the plugin registers ([#14](https://github.com/codeur/capistrano-solid_queue/pull/14)), tells to enable lingering for user services, and links to the right code of conduct ([#15](https://github.com/codeur/capistrano-solid_queue/pull/15)).
+- The README says when the gem isn't needed (Solid Queue running inside Puma) and how to pass `bin/jobs` options ([#16](https://github.com/codeur/capistrano-solid_queue/pull/16)).
 - The gem's changelog link points to this file, and the gem no longer ships its outdated RBS signature, `.standard.yml` and `Rakefile` ([#15](https://github.com/codeur/capistrano-solid_queue/pull/15)).
 
 ## [0.1.3] - 2026-11-09

@@ -46,13 +46,6 @@ namespace :solid_queue do # rubocop:disable Metrics
     end
   end
 
-  desc "Quiet solid_queue (start graceful termination)"
-  task :quiet do
-    on roles(fetch(:solid_queue_role)) do
-      plugin.execute_systemd("kill", "-s", "SIGTERM", fetch(:solid_queue_service_unit_name), raise_on_non_zero_exit: false)
-    end
-  end
-
   desc "Start solid_queue service via systemd"
   task :start do
     on roles(fetch(:solid_queue_role)) do
