@@ -70,6 +70,49 @@ through their Capistrano counterparts, ex: `bundle exec cap solid_queue:restart`
 The plugin has registered a Capistrano `hook` to run `bundle exec cap solid_queue:restart` after deploy.
 See [`#register_hooks`](lib/capistrano/solid_queue.rb)
 
+## Configuration
+
+These variables can be set in `config/deploy.rb` or in a stage file. The values below are the defaults.
+
+```ruby
+set :solid_queue_role, "db"
+set :solid_queue_access_log, -> { File.join(shared_path, "log", "solid_queue.log") }
+set :solid_queue_error_log, -> { File.join(shared_path, "log", "solid_queue.log") }
+set :solid_queue_service_unit_name, -> { "#{fetch(:application)}_solid_queue_#{fetch(:stage)}" }
+set :solid_queue_service_unit_env_vars, -> { fetch(:service_unit_env_vars, []) }
+set :solid_queue_service_unit_env_files, -> { fetch(:service_unit_env_files, []) }
+```
+
+After changing any of them, run `cap <stage> solid_queue:install` again: deploys don't regenerate the service.
+
+### User or system service
+
+By default, Solid Queue runs as a user service: `systemctl --user`, with the unit file in `~/.config/systemd/user`. To run it as a system service instead:
+
+```ruby
+set :solid_queue_systemctl_user, :system
+```
+
+The unit file then goes to `/etc/systemd/system/`, `systemctl` runs through `sudo`, and the service runs as the user Capistrano connects with. `:solid_queue_systemd_conf_dir` sets another directory for the unit file.
+
+### Environment
+
+The service gets these variables, in this order:
+
+1. `RAILS_ENV`, from `:rails_env`, or from `:stage` when `:rails_env` isn't set.
+2. Capistrano's `default_env`, except `PATH`. Each value is expanded by the server shell, as in Capistrano commands (`$HOME`…).
+3. `MALLOC_ARENA_MAX=2`.
+4. `:solid_queue_service_unit_env_vars`, written as is in `Environment="…"` lines.
+
+A later line overrides an earlier one, so `:solid_queue_service_unit_env_vars` can override any of the above. The files of `:solid_queue_service_unit_env_files` (`EnvironmentFile=` lines) override all of them. systemd doesn't start the service when one of these files is missing, unless its path starts with `-`.
+
+```ruby
+set :solid_queue_service_unit_env_vars, ["MALLOC_ARENA_MAX=4"]
+set :solid_queue_service_unit_env_files, ["/var/www/my_app/shared/.env", "-/etc/default/my_app"]
+```
+
+When they aren't set, the `:service_unit_env_vars` and `:service_unit_env_files` variables, also read by capistrano3-puma and capistrano-sidekiq, are used.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
