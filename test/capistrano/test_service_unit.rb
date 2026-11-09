@@ -30,6 +30,12 @@ class Capistrano::TestServiceUnit < Minitest::Test
     assert_includes unit, %(Environment='GREETING=say "hi"')
   end
 
+  def test_default_env_keeps_values_starting_with_dashes
+    unit = generate_unit(stage_config: 'set :default_env, { ruby_configure_opts: "--with-jemalloc=/usr/include/jemalloc --enable-yjit" }')
+
+    assert_includes unit, "Environment='RUBY_CONFIGURE_OPTS=--with-jemalloc=/usr/include/jemalloc --enable-yjit'"
+  end
+
   private
 
   def generate_unit(stage_config: "")
