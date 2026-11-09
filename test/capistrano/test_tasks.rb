@@ -72,11 +72,12 @@ class Capistrano::TestTasks < Minitest::Test
     end
   end
 
-  def test_there_is_no_reload_task
+  def test_there_is_no_reload_or_quiet_task
     run_cap("--tasks") do |output, status|
       assert status.success?, output
       assert_includes output, "solid_queue:restart"
       refute_includes output, "solid_queue:reload"
+      refute_includes output, "solid_queue:quiet"
     end
   end
 end
