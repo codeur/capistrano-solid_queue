@@ -5,41 +5,29 @@ plugin = self
 namespace :solid_queue do # rubocop:disable Metrics
   desc "Generate solid_queue systemd service"
   task :generate do
-    on roles(fetch(:solid_queue_role)) do |role|
-      service_file = File.expand_path("../../templates/solid_queue.service.erb", __FILE__)
-      erb = File.read(service_file)
-      File.write "solid_queue.service", ERB.new(erb, trim_mode: "-").result(binding)
+    on roles(fetch(:solid_queue_role)) do
+      File.write "solid_queue.service", plugin.service_unit(binding)
     end
   end
 
   desc "Install solid_queue systemd service"
   task :install do
-    on roles(fetch(:solid_queue_role)) do |role|
-      execute :mkdir, "-p", fetch(:solid_queue_systemd_conf_dir)
+    on roles(fetch(:solid_queue_role)) do
+      tmp_path = File.join(fetch(:tmp_dir), plugin.service_unit_file)
+      upload! StringIO.new(plugin.service_unit(binding)), tmp_path
+      plugin.sudo_if_needed("mkdir", "-p", fetch(:solid_queue_systemd_conf_dir))
+      plugin.sudo_if_needed("mv", tmp_path, File.join(fetch(:solid_queue_systemd_conf_dir), plugin.service_unit_file))
 
-      service_file = File.expand_path("../../templates/solid_queue.service.erb", __FILE__)
-      erb = File.read(service_file)
-      file = StringIO.new(ERB.new(erb, trim_mode: "-").result(binding))
-
-      systemd_path = fetch(:solid_queue_systemd_conf_dir)
-      path = "#{systemd_path}/#{fetch(:solid_queue_service_unit_name)}.service"
-
-      execute :mkdir, "-p", systemd_path
-      upload! file, path
-
-      # Reload systemd
       plugin.execute_systemd("daemon-reload")
-      invoke "solid_queue:enable"
+      plugin.execute_systemd("enable", fetch(:solid_queue_service_unit_name))
     end
   end
 
   desc "Uninstall solid_queue systemd service"
   task :uninstall do
     invoke "solid_queue:disable"
-    on roles(fetch(:solid_queue_role)) do |role|
-      systemd_path = fetch(:solid_queue_systemd_conf_dir)
-      execute :rm, "-f", "#{systemd_path}/#{fetch(:solid_queue_service_unit_name)}*"
-
+    on roles(fetch(:solid_queue_role)) do
+      plugin.sudo_if_needed("rm", "-f", File.join(fetch(:solid_queue_systemd_conf_dir), plugin.service_unit_file))
       plugin.execute_systemd("daemon-reload")
     end
   end
@@ -86,17 +74,10 @@ namespace :solid_queue do # rubocop:disable Metrics
     end
   end
 
-  desc "Reload solid_queue service via systemd"
-  task :reload do
-    on roles(fetch(:solid_queue_role)) do
-      plugin.execute_systemd("reload", fetch(:solid_queue_service_unit_name))
-    end
-  end
-
   desc "Get solid_queue service status via systemd"
   task :status do
     on roles(fetch(:solid_queue_role)) do
-      plugin.execute_systemd("status", fetch(:solid_queue_service_unit_name))
+      plugin.execute_systemd("status", fetch(:solid_queue_service_unit_name), raise_on_non_zero_exit: false)
     end
   end
 end

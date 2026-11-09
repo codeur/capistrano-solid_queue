@@ -20,6 +20,10 @@ class Capistrano::TestServiceUnit < Minitest::Test
     refute_match(/^User=/, generate_unit)
   end
 
+  def test_service_has_no_reload_command
+    refute_includes generate_unit, "ExecReload"
+  end
+
   def test_service_unit_env_vars_and_files
     unit = generate_unit(stage_config: <<~RUBY)
       set :solid_queue_service_unit_env_vars, ["MALLOC_ARENA_MAX=4", "GREETING=two words"]

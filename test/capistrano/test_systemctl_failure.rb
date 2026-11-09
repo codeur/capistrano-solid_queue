@@ -24,6 +24,13 @@ class Capistrano::TestSystemctlFailure < Minitest::Test
     end
   end
 
+  def test_status_goes_on_when_the_service_is_not_running
+    run_cap("solid_queue:status", stage_config: 'SSHKit.config.command_map[:"/bin/systemctl"] = "false"') do |output, status|
+      assert_includes output, "false --user status app_solid_queue_preprod"
+      assert status.success?, output
+    end
+  end
+
   def test_stop_aborts_when_systemctl_fails
     run_cap("solid_queue:stop", stage_config: 'SSHKit.config.command_map[:"/bin/systemctl"] = "false"') do |output, status|
       assert_includes output, "false --user stop app_solid_queue_preprod"

@@ -20,10 +20,17 @@ module Capistrano
       end
 
       def register_hooks
-        after "deploy:starting", "solid_queue:quiet"
         after "deploy:updated", "solid_queue:stop"
         after "deploy:published", "solid_queue:start"
         after "deploy:failed", "solid_queue:restart"
+      end
+
+      def service_unit(context)
+        ERB.new(File.read(File.expand_path("templates/solid_queue.service.erb", __dir__)), trim_mode: "-").result(context)
+      end
+
+      def service_unit_file
+        "#{fetch(:solid_queue_service_unit_name)}.service"
       end
 
       def execute_systemd(*args, raise_on_non_zero_exit: true)

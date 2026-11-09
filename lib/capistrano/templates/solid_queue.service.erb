@@ -13,7 +13,6 @@ Environment='<%= variable.to_s.upcase %>=<%= capture(:printf, "%s", %("#{value.t
 <% end -%>
 WorkingDirectory=<%= current_path %>
 ExecStart=<%= capture(:echo, SSHKit.config.command_map[:bundle]).strip %> exec rake solid_queue:start
-ExecReload=/bin/kill -TSTP $MAINPID
 ExecStop=/bin/kill -TERM $MAINPID
 Environment=MALLOC_ARENA_MAX=2
 <% fetch(:solid_queue_service_unit_env_vars).each do |variable| -%>
