@@ -42,7 +42,7 @@ To prevent loading [the hooks](lib/capistrano/solid_queue.rb) of the plugin, add
 ```ruby
 # Capfile
 
-install_plugin Capistrano::SolidQueue, load_hooks: false
+install_plugin Capistrano::SolidQueue::Systemd, load_hooks: false
 ```
 
 Then run once
