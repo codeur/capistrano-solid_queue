@@ -25,12 +25,12 @@ module Capistrano
       end
 
       def execute_systemd(*args, raise_on_non_zero_exit: true)
-        sudo_if_needed(*systemd_command(*args), raise_on_non_zero_exit: true)
+        sudo_if_needed(*systemd_command(*args), raise_on_non_zero_exit: raise_on_non_zero_exit)
       end
 
       def sudo_if_needed(*command, raise_on_non_zero_exit: true)
         if fetch(:solid_queue_systemctl_user) == :system
-          backend.sudo command.join(" ")
+          backend.sudo command.join(" "), raise_on_non_zero_exit: raise_on_non_zero_exit
         else
           backend.execute(*command, raise_on_non_zero_exit: raise_on_non_zero_exit)
         end
