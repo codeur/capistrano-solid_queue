@@ -1,6 +1,7 @@
 ## [Unreleased]
 
 - `RAILS_ENV` of the systemd service now comes from `:rails_env`, falling back to `:stage` [#8](https://github.com/codeur/capistrano-solid_queue/issues/8). Run `cap <stage> solid_queue:install` again to update an installed service.
+- `solid_queue:quiet` no longer aborts the deploy when `systemctl` fails, as before 0.1.1.
 
 ## [0.1.2] - 2025-06-12
 
