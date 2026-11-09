@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-09
+
 ### Added
 
 - `:solid_queue_service_unit_env_vars` and `:solid_queue_service_unit_env_files` add `Environment=` and `EnvironmentFile=` lines to the systemd service. They default to `:service_unit_env_vars` and `:service_unit_env_files`, as in capistrano3-puma and capistrano-sidekiq ([#13](https://github.com/codeur/capistrano-solid_queue/pull/13), from [#6](https://github.com/codeur/capistrano-solid_queue/pull/6) by [@floriancrusius](https://github.com/floriancrusius)).
@@ -62,7 +64,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Initial release.
 
-[unreleased]: https://github.com/codeur/capistrano-solid_queue/compare/v0.1.3...HEAD
+[unreleased]: https://github.com/codeur/capistrano-solid_queue/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/codeur/capistrano-solid_queue/compare/v0.1.3...v0.2.0
 [0.1.3]: https://github.com/codeur/capistrano-solid_queue/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/codeur/capistrano-solid_queue/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/codeur/capistrano-solid_queue/compare/v0.1.0...v0.1.1
