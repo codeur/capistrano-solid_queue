@@ -9,7 +9,7 @@ require "open3"
 require "tmpdir"
 
 module CapistranoProject
-  def run_cap(task, stage_config: "")
+  def run_cap(*tasks, stage_config: "")
     Dir.mktmpdir do |dir|
       FileUtils.mkdir_p(File.join(dir, "config", "deploy"))
       File.write(File.join(dir, "Capfile"), <<~RUBY)
@@ -30,7 +30,7 @@ module CapistranoProject
         #{stage_config}
       RUBY
 
-      output, status = Open3.capture2e(RbConfig.ruby, Gem.bin_path("capistrano", "cap"), "preprod", task, chdir: dir)
+      output, status = Open3.capture2e(RbConfig.ruby, Gem.bin_path("capistrano", "cap"), "preprod", *tasks, chdir: dir)
       yield output, status, dir
     end
   end
