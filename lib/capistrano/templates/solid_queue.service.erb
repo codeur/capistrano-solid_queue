@@ -6,7 +6,7 @@ After=syslog.target network.target
 Type=simple
 Environment='RAILS_ENV=<%= fetch(:rails_env, fetch(:stage)) %>'
 <% fetch(:default_env).reject{ |k, _| k.to_s == 'path' }.each do |variable, value| -%>
-Environment='<%= variable.to_s.upcase %>=<%= value.to_s %>'
+Environment='<%= variable.to_s.upcase %>=<%= capture(:printf, "%s", %("#{value.to_s.gsub('"', '\"')}")) %>'
 <% end -%>
 WorkingDirectory=<%= current_path %>
 ExecStart=<%= capture(:echo, SSHKit.config.command_map[:bundle]).strip %> exec rake solid_queue:start
