@@ -67,7 +67,13 @@ through their Capistrano counterparts, ex: `bundle exec cap solid_queue:restart`
 
 ## Usage
 
-The plugin has registered a Capistrano `hook` to run `bundle exec cap solid_queue:restart` after deploy.
+The plugin registers these Capistrano hooks:
+
+- after `deploy:starting`, `solid_queue:quiet` sends `SIGTERM` to the service, so Solid Queue starts a graceful shutdown;
+- after `deploy:updated`, `solid_queue:stop` stops the service;
+- after `deploy:published`, `solid_queue:start` starts the service on the new release;
+- after `deploy:failed`, `solid_queue:restart` restarts the service.
+
 See [`#register_hooks`](lib/capistrano/solid_queue.rb)
 
 ## Configuration
