@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- `:solid_queue_service_unit_env_vars` and `:solid_queue_service_unit_env_files` add `Environment=` and `EnvironmentFile=` lines to the systemd service. They default to `:service_unit_env_vars` and `:service_unit_env_files`, as in capistrano3-puma and capistrano-sidekiq ([#13](https://github.com/codeur/capistrano-solid_queue/pull/13), from [#6](https://github.com/codeur/capistrano-solid_queue/pull/6) by [@floriancrusius](https://github.com/floriancrusius)).
+- A Configuration section in the README ([#13](https://github.com/codeur/capistrano-solid_queue/pull/13)).
+
+### Changed
+
+- In `:system` mode, the service runs as the user Capistrano connects with instead of root. Run `cap <stage> solid_queue:install` again, then give that user back the files the service may have created as root ([#13](https://github.com/codeur/capistrano-solid_queue/pull/13), from [#6](https://github.com/codeur/capistrano-solid_queue/pull/6) by [@floriancrusius](https://github.com/floriancrusius)).
+- The service description names the application and the stage ([#13](https://github.com/codeur/capistrano-solid_queue/pull/13)).
+
 ## [0.1.3] - 2026-11-09
 
 ### Fixed
