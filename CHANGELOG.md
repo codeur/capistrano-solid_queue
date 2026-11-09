@@ -15,6 +15,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - In `:system` mode, the service runs as the user Capistrano connects with instead of root. Run `cap <stage> solid_queue:install` again, then give that user back the files the service may have created as root ([#13](https://github.com/codeur/capistrano-solid_queue/pull/13), from [#6](https://github.com/codeur/capistrano-solid_queue/pull/6) by [@floriancrusius](https://github.com/floriancrusius)).
 - The service description names the application and the stage ([#13](https://github.com/codeur/capistrano-solid_queue/pull/13)).
+- Deploys no longer run `solid_queue:quiet` after `deploy:starting`. Solid Queue has no quiet mode: the `SIGTERM` it sends starts a shutdown, so jobs stopped for the whole deploy. The service is now stopped after `deploy:updated` and started after `deploy:published` ([#15](https://github.com/codeur/capistrano-solid_queue/pull/15)).
+- Ruby 3.1 or later is required ([#15](https://github.com/codeur/capistrano-solid_queue/pull/15)).
+- Capistrano 3.5 or later is required: `Capistrano::Plugin` doesn't exist before ([#15](https://github.com/codeur/capistrano-solid_queue/pull/15)).
+
+### Removed
+
+- `solid_queue:reload` and the `ExecReload=` line of the service: the `SIGTSTP` it sent didn't reload Solid Queue ([#15](https://github.com/codeur/capistrano-solid_queue/pull/15)).
+
+### Fixed
+
+- In `:system` mode, `solid_queue:install` and `solid_queue:uninstall` work when Capistrano doesn't connect as root: the unit is uploaded to `:tmp_dir`, then moved and removed with `sudo` ([#15](https://github.com/codeur/capistrano-solid_queue/pull/15)).
+- `solid_queue:install` enables the service on each server right after uploading its unit there, instead of running `solid_queue:enable` on every server from the first one ([#15](https://github.com/codeur/capistrano-solid_queue/pull/15)).
+- `solid_queue:uninstall` removes only the unit of the service, not every file whose name starts with it ([#15](https://github.com/codeur/capistrano-solid_queue/pull/15)).
+- `solid_queue:status` shows the status of a stopped service instead of failing ([#15](https://github.com/codeur/capistrano-solid_queue/pull/15)).
+- The README lists the hooks the plugin registers ([#14](https://github.com/codeur/capistrano-solid_queue/pull/14)), tells to enable lingering for user services, and links to the right code of conduct ([#15](https://github.com/codeur/capistrano-solid_queue/pull/15)).
+- The gem's changelog link points to this file, and the gem no longer ships its outdated RBS signature, `.standard.yml` and `Rakefile` ([#15](https://github.com/codeur/capistrano-solid_queue/pull/15)).
 
 ## [0.1.3] - 2026-11-09
 

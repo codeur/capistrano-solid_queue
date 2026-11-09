@@ -3,17 +3,16 @@
 Adds the following capistrano commands:
 
 ```sh
-solid_queue:generate                   # Generate locally solid_queue systemd service unit file
-solid_queue:disable                    # Disable solid_queue systemd service
-solid_queue:enable                     # Enable solid_queue systemd service
-solid_queue:install                    # Install solid_queue systemd service
-solid_queue:reload                     # Reload solid_queue service via systemd
-solid_queue:quiet                      # Quiet solid_queue service via systemd
-solid_queue:restart                    # Restart solid_queue service via systemd
-solid_queue:start                      # Start solid_queue service via systemd
-solid_queue:status                     # Get solid_queue service status via systemd
-solid_queue:stop                       # Stop solid_queue service via systemd
-solid_queue:uninstall                  # Uninstall solid_queue systemd service
+cap solid_queue:disable               # Disable solid_queue systemd service
+cap solid_queue:enable                # Enable solid_queue systemd service
+cap solid_queue:generate              # Generate solid_queue systemd service
+cap solid_queue:install               # Install solid_queue systemd service
+cap solid_queue:quiet                 # Quiet solid_queue (start graceful termination)
+cap solid_queue:restart               # Restart solid_queue service via systemd
+cap solid_queue:start                 # Start solid_queue service via systemd
+cap solid_queue:status                # Get solid_queue service status via systemd
+cap solid_queue:stop                  # Stop solid_queue service via systemd
+cap solid_queue:uninstall             # Uninstall solid_queue systemd service
 ```
 
 
@@ -53,23 +52,27 @@ bundle exec cap production solid_queue:install
 
 for the initial setup. This will copy a [`systemd` service definition](lib/capistrano/templates/solid_queue.service.erb) to `~/.config/systemd/user/<application>_solid_queue_<stage>.service` on your server marked with Capistrano role `db`.
 
-It will also `enable` it in `systemd`, allowing to to then run commands such as:
+It will also `enable` it in `systemd`, so that you can then run commands such as:
 
 ```sh
 systemctl --user status your_app_solid_queue_production
 systemctl --user start your_app_solid_queue_production
 systemctl --user stop your_app_solid_queue_production
-systemctl --user reload your_app_solid_queue_production
 systemctl --user restart your_app_solid_queue_production
 ```
 
-through their Capistrano counterparts, ex: `bundle exec cap solid_queue:restart`.
+through their Capistrano counterparts, ex: `bundle exec cap production solid_queue:restart`.
+
+A user service only runs while its user has a session open on the server, unless lingering is enabled for that user. Enable it once on each server, with the user Capistrano connects with:
+
+```sh
+sudo loginctl enable-linger deploy
+```
 
 ## Usage
 
 The plugin registers these Capistrano hooks:
 
-- after `deploy:starting`, `solid_queue:quiet` sends `SIGTERM` to the service, so Solid Queue starts a graceful shutdown;
 - after `deploy:updated`, `solid_queue:stop` stops the service;
 - after `deploy:published`, `solid_queue:start` starts the service on the new release;
 - after `deploy:failed`, `solid_queue:restart` restarts the service.
@@ -135,7 +138,7 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the Capistrano::SolidQueue project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/capistrano-solid_queue/blob/main/CODE_OF_CONDUCT.md).
+Everyone interacting in the Capistrano::SolidQueue project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/codeur/capistrano-solid_queue/blob/main/CODE_OF_CONDUCT.md).
 
 ## Credits
 
