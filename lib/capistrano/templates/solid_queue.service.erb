@@ -4,7 +4,7 @@ After=syslog.target network.target
 
 [Service]
 Type=simple
-Environment='RAILS_ENV=<%= fetch(:stage) %>'
+Environment='RAILS_ENV=<%= fetch(:rails_env, fetch(:stage)) %>'
 <% fetch(:default_env).reject{ |k, _| k.to_s == 'path' }.each do |variable, value| -%>
 Environment='<%= variable.to_s.upcase %>=<%= value.to_s %>'
 <% end -%>
