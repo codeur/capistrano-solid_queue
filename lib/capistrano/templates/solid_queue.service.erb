@@ -1,9 +1,12 @@
 [Unit]
-Description=SolidQueue background job
+Description=SolidQueue background job for <%= fetch(:application) %> (<%= fetch(:stage) %>)
 After=syslog.target network.target
 
 [Service]
 Type=simple
+<% if fetch(:solid_queue_systemctl_user) == :system -%>
+User=<%= capture(:id, "-un") %>
+<% end -%>
 Environment='RAILS_ENV=<%= fetch(:rails_env, fetch(:stage)) %>'
 <% fetch(:default_env).reject{ |k, _| k.to_s == 'path' }.each do |variable, value| -%>
 Environment='<%= variable.to_s.upcase %>=<%= capture(:printf, "%s", %("#{value.to_s.gsub('"', '\"')}")) %>'
@@ -13,6 +16,12 @@ ExecStart=<%= capture(:echo, SSHKit.config.command_map[:bundle]).strip %> exec r
 ExecReload=/bin/kill -TSTP $MAINPID
 ExecStop=/bin/kill -TERM $MAINPID
 Environment=MALLOC_ARENA_MAX=2
+<% fetch(:solid_queue_service_unit_env_vars).each do |variable| -%>
+Environment="<%= variable %>"
+<% end -%>
+<% fetch(:solid_queue_service_unit_env_files).each do |file| -%>
+EnvironmentFile=<%= file %>
+<% end -%>
 
 # if we crash, restart
 RestartSec=1
